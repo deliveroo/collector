@@ -1,0 +1,83 @@
+docker_version: &docker_version 17.06.0-ce
+
+defaults: &defaults
+  working_directory: /pganalyze-collector
+  docker:
+    - image: deliveroo/circleci:0.1.8
+
+version: 2
+
+jobs:
+  run_ci:
+    <<: *defaults
+
+    steps:
+      - setup_remote_docker:
+          version: *docker_version
+          reusable: true
+
+      - checkout
+
+      - run:
+          name: Clean up reusable docker
+          command: docker system prune -f
+
+      - run:
+          name: Build composition
+          command: ci build
+
+      - run:
+          name: Set up the packages
+          command: ci run --rm app go get -v -t -d ./...
+
+      - run:
+          name: Run and report test results
+          command: ci run --rm app go test -v ./...
+
+  push_image_staging: &push
+    <<: *defaults
+
+    environment:
+      - TARGET: staging
+
+    steps:
+      - setup_remote_docker:
+          reusable: true
+          version: *docker_version
+
+      - checkout
+
+      - run:
+          name: Make sure we are on HEAD
+          command: ensure_head
+
+      - run:
+          name: Build image
+          command: |
+            `print_env ${TARGET}`
+            docker build \
+              --build-arg ARG_CRYPTO_ENV_DECRYPT_KEY=${CRYPTO_ENV_DECRYPT_KEY} \
+              --tag pganalyze-collector:${CIRCLE_SHA1} \
+              .
+      - run:
+          name: Push image to ECR
+          command: |
+            `print_env ${TARGET}`
+            push_image_to_ecr \
+              --image-name pganalyze-collector \
+              --ecr-repo $AWS_ECR_REPO_URL \
+              --aws-region $AWS_REGION
+
+
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - run_ci
+      - push_image_staging:
+          requires:
+            - run_ci
+          filters:
+            branches:
+              only:
+                - staging
