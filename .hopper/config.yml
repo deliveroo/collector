@@ -1,0 +1,12 @@
+version: '1'
+
+resources: &resources
+  cpu: 100
+  memory: 512
+  essential: true
+
+services:
+  worker:
+    containerDefinitions:
+      worker:
+        <<: *resources
