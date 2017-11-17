@@ -73,11 +73,11 @@ workflows:
   version: 2
   test_and_build:
     jobs:
-      - run_ci
-      - push_image_staging:
-          requires:
-            - run_ci
-          filters:
-            branches:
-              only:
-                - staging
+      # - run_ci
+      - push_image_staging
+          # requires:
+          #   - run_ci
+          # filters:
+          #   branches:
+          #     only:
+          #       - staging
