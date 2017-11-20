@@ -1,5 +1,5 @@
-FROM golang:1.9.2-alpine
 FROM deliveroo/decrypt_env:0.2.0 as decrypt_env
+FROM golang:1.9.2-alpine
 MAINTAINER team@pganalyze.com
 
 RUN adduser -D pganalyze pganalyze
