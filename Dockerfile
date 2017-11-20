@@ -7,6 +7,10 @@ ENV GOPATH /go
 ENV HOME_DIR /home/pganalyze
 ENV CODE_DIR $GOPATH/src/github.com/pganalyze/collector
 
+
+COPY --from=decrypt_env /decrypt_env /usr/bin/decrypt_env
+COPY --from=decrypt_env /dumb-init /usr/bin/dumb-init
+
 COPY . $CODE_DIR
 WORKDIR $CODE_DIR
 
