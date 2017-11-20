@@ -10,3 +10,4 @@ services:
     containerDefinitions:
       worker:
         <<: *resources
+        command: "/usr/local/bin/gosu pganalyze /home/pganalyze/collector --statefile=/state/pganalyze-collector.state"
