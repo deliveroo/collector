@@ -24,4 +24,5 @@ RUN mkdir /state
 RUN chown pganalyze:pganalyze /state
 VOLUME ["/state"]
 
+ENTRYPOINT ["dumb-init", "--", "decrypt_env"]
 CMD ["/usr/local/bin/gosu", "pganalyze", "/home/pganalyze/collector", "--statefile=/state/pganalyze-collector.state"]
