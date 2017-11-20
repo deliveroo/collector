@@ -16,17 +16,14 @@ WORKDIR $CODE_DIR
 # We run this all in one layer to reduce the resulting image size
 RUN apk add --no-cache --virtual .build-deps make curl libc-dev gcc go git tar \
   && apk add --no-cache ca-certificates \
-  && curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.6/gosu-amd64" \
   && make build_dist OUTFILE=$HOME_DIR/collector \
   && rm -rf $GOPATH \
 	&& apk del --purge .build-deps
-
-RUN chmod +x /usr/local/bin/gosu
-RUN chown pganalyze:pganalyze $HOME_DIR/collector
 
 RUN mkdir /state
 RUN chown pganalyze:pganalyze /state
 VOLUME ["/state"]
 
 ENTRYPOINT ["decrypt_env"]
-CMD ["/usr/local/bin/gosu", "pganalyze", "/home/pganalyze/collector", "--statefile=/state/pganalyze-collector.state"]
+USER pganalyze
+CMD ["/home/pganalyze/collector", "--verbose", "--statefile=/state/pganalyze-collector.state"]
