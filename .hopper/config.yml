@@ -4,6 +4,8 @@ resources: &resources
   cpu: 100
   memory: 512
   essential: true
+  linuxParameters:
+    initProcessEnabled: true
 
 services:
   worker:

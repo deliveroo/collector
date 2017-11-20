@@ -1,4 +1,4 @@
-FROM deliveroo/decrypt_env:0.2.0 as decrypt_env
+FROM deliveroo/decrypt_env:0.5.1 as decrypt_env
 FROM golang:1.9.2-alpine
 MAINTAINER team@pganalyze.com
 
@@ -9,7 +9,6 @@ ENV CODE_DIR $GOPATH/src/github.com/pganalyze/collector
 
 
 COPY --from=decrypt_env /decrypt_env /usr/bin/decrypt_env
-COPY --from=decrypt_env /dumb-init /usr/bin/dumb-init
 
 COPY . $CODE_DIR
 WORKDIR $CODE_DIR
@@ -29,5 +28,5 @@ RUN mkdir /state
 RUN chown pganalyze:pganalyze /state
 VOLUME ["/state"]
 
-ENTRYPOINT ["dumb-init", "--", "decrypt_env"]
+ENTRYPOINT ["decrypt_env"]
 CMD ["/usr/local/bin/gosu", "pganalyze", "/home/pganalyze/collector", "--statefile=/state/pganalyze-collector.state"]
