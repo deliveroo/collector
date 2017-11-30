@@ -53,12 +53,7 @@ jobs:
 
       - run:
           name: Build image
-          command: |
-            `print_env ${TARGET}`
-            docker build \
-              --build-arg ARG_CRYPTO_ENV_DECRYPT_KEY=${CRYPTO_ENV_DECRYPT_KEY} \
-              --tag pganalyze-collector:${CIRCLE_SHA1} \
-              .
+          command: docker build --tag pganalyze-collector:${CIRCLE_SHA1} .
       - run:
           name: Push image to ECR
           command: |
